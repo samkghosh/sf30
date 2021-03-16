@@ -69,6 +69,14 @@ public:
    void autoDial(QString phoneNum);
    void setDialContext(int ic);
    int getDialContext();
+   void processBargeIn(int iSource=1);
+   void processWhisper(int iSource=1);
+   void processTransfer(int iSource=1);
+   void processHangup();
+   void processAnswer();
+   void processHold();
+   void processMute();
+
 
 private slots:
     void onEPStatusChange(int status);
@@ -216,6 +224,9 @@ Q_SIGNALS:
     void onDispPhoneStatus(QString sts);
     void onDispMsg(QString sts);
     void onDispCallStatus(QString sts);
+    void onHangupBtn(int iFlag);
+    void onAnswerBtn(int iFlag);
+    void onHoldBtn(int iFlag);
 
 
 private:

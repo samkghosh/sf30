@@ -884,7 +884,7 @@
   <widget class="QPushButton" name="pb_setting">
    <property name="geometry">
     <rect>
-     <x>680</x>
+     <x>600</x>
      <y>390</y>
      <width>84</width>
      <height>28</height>
@@ -987,6 +987,57 @@
    </property>
    <property name="text">
     <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbAnswer">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>330</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Answer</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbHangup">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>350</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Hangup</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbHold">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>370</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Hold</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

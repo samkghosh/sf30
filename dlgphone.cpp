@@ -322,7 +322,9 @@ void DlgPhone::onIncomingCall(risip::RisipCall *call)
 
     // activate Hangup
     ui->pbHangup->setDisabled(false);
+    emit onHangupBtn(1);
     ui->pbAnswer->setDisabled(false);
+    emit onAnswerBtn(1);
 }
 
 
@@ -340,6 +342,7 @@ void DlgPhone::onCallStatusChanged()
     if (st == RisipCall::Status::IncomingCallStarted || st == RisipCall::Status::OutgoingCallStarted)
     {
         ui->pbHangup->setDisabled(false);
+        emit onHangupBtn(1);
     }
 
 }
@@ -505,6 +508,7 @@ void DlgPhone::on_pbDial_clicked()
 //        activeCall->call();
         call->call();
         ui->pbHangup->setDisabled(false);
+        emit onHangupBtn(1);
         bDialRequest = true;
 
     }
@@ -519,6 +523,11 @@ void DlgPhone::on_pbSetting_clicked()
 
 void DlgPhone::on_pbAnswer_clicked()
 {
+    this->processAnswer();
+}
+
+void DlgPhone::processAnswer()
+{
     //int callStatus = activeCall->status();
     //QMessageBox::information(this, "ActiveCall", "Status="+QString::number(callStatus));
 
@@ -528,6 +537,7 @@ void DlgPhone::on_pbAnswer_clicked()
 
 
     ui->pbHangup->setDisabled(false);
+    emit onHangupBtn(1);
     ui->pbHold->setDisabled(false);
     bHoldStatus = false;
 
@@ -536,7 +546,13 @@ void DlgPhone::on_pbAnswer_clicked()
     ui->pbHangup->setStyleSheet(QString("QPushButton {background-color: %1}").arg(COLOUR_RED));
 }
 
+
 void DlgPhone::on_pbHold_clicked()
+{
+    this->processHold();
+}
+
+void DlgPhone::processHold()
 {
     int callStatus = activeCall->status();
     //QMessageBox::information(this, "ActiveCall", "Status="+QString::number(callStatus));
@@ -579,7 +595,14 @@ void DlgPhone::on_pbHold_clicked()
 
 }
 
+
+
 void DlgPhone::on_pbHangup_clicked()
+{
+    this->processHangup();
+}
+
+void DlgPhone::processHangup()
 {
     bHoldStatus = false;
     ui->pbHold->setText("Hold");
@@ -609,7 +632,6 @@ void DlgPhone::on_pbHangup_clicked()
 //    setMute(0);
 
 }
-
 
 void DlgPhone::onCallStatusChanged1(RisipAccount *account)
 {
@@ -706,6 +728,7 @@ void DlgPhone::onlastResponseCodeChanged(int response)
         bDialRequest =false;
 //        displayMsg("Unable to perform.["+QString::number(response) + "]");
         ui->pbHangup->setDisabled(true);
+        emit onHangupBtn(0);
         ui->leNumber->setText("");
     }
 }
@@ -751,6 +774,7 @@ void DlgPhone::onActiveCallChanged(RisipCall *call)
          else
          {
              ui->pbHangup->setDisabled(false);
+             emit onHoldBtn(1);
          }
      }
 }
@@ -808,6 +832,29 @@ void DlgPhone::on_pbTxfr_clicked()
     }
 }
 
+
+void DlgPhone::processTransfer(int iSource)
+{
+    int status = activeCall->status();
+
+    if (status ==  RisipCall::Status::CallConfirmed)
+    {
+        dlgIntercom->setContext(1);
+        iCurrContext = CONTEXT_TXFR;
+        if ( iSource ==1)
+            on_pbIntercom_clicked();
+
+        displayMsg("Click on Intercom to Transfer.");
+//    dlgIntercom->show();
+    }
+    else
+    {
+        QMessageBox::warning(this, "Transfer","No active call to transfer");
+    }
+}
+
+
+
 void DlgPhone::on_pbAddCall_clicked()
 {
     dlgIntercom->setContext(2);
@@ -855,25 +902,37 @@ void DlgPhone::dialSpecial(QString code, QString num, QString msg)
 
 void DlgPhone::on_pbBergein_clicked()
 {
+    this->processBargeIn();
+}
+
+void DlgPhone::processBargeIn(int iSource)
+{
    DialedNumber = ui->leNumber->text();
    if (DialedNumber.length() == 0)
    {
-       displayMsg("Select an Extension to Berge-in mode");
+       displayMsg("Select an Extension to Barge-in mode");
        iCurrContext = CONTEXT_BARGEIN;
        dlgIntercom->setContext(iCurrContext);
-       on_pbIntercom_clicked();
+        // if request from Intercom panel
+       if (iSource == 1)
+           on_pbIntercom_clicked();
 
    }
    else
    {
-       displayMsg("Select an Extension to Berge-in mode");
-       dialSpecial(CODE_BERGEIN,DialedNumber, "Call Barge-in");
+       displayMsg("Select an Extension to Barge-in mode");
+       dialSpecial(CODE_BARGEIN,DialedNumber, "Call Barge-in");
    }
    ui->pbAnswer->setStyleSheet(QString("QPushButton {background-color: %1}").arg(COLOUR_YELLOW));
 
 }
 
 void DlgPhone::on_pbWhisper_clicked()
+{
+    this->processWhisper();
+}
+
+void DlgPhone::processWhisper(int iSource)
 {
    DialedNumber = ui->leNumber->text();
 
@@ -883,7 +942,8 @@ void DlgPhone::on_pbWhisper_clicked()
 
        iCurrContext = CONTEXT_WHISPER;
        dlgIntercom->setContext(iCurrContext);
-       on_pbIntercom_clicked();
+       if ( iSource == 1)
+           on_pbIntercom_clicked();
 
    }
    else
@@ -892,7 +952,6 @@ void DlgPhone::on_pbWhisper_clicked()
     }
 
 }
-
 
 
 void DlgPhone::setSignal()
@@ -965,7 +1024,10 @@ void DlgPhone::setButtonState()
     ui->pbSpeedDial->setDisabled(false);
     ui->pbTxfr->setDisabled(false);
     ui->pbAnswer->setDisabled(true);
+    emit onAnswerBtn(0);
     ui->pbHangup->setDisabled(false);
+    emit onHangupBtn(1);
+
     ui->pbHold->setDisabled(true);
     ui->pbConfCall->setDisabled(false);
     ui->pbChat->setDisabled(true);
@@ -1194,8 +1256,13 @@ void DlgPhone::UpdateCallStatus()
     {
         case RisipCall::Status::Null:
             ui->pbHold->setDisabled(true);
+            emit onHoldBtn(0);
+
             ui->pbHangup->setDisabled(true);
+            emit onHangupBtn(0);
+
             ui->pbAnswer->setDisabled(true);
+            emit onAnswerBtn(0);
             ui->pbAnswer->setStyleSheet("QPushButton {background-color: white}");
             ui->pbHangup->setStyleSheet("QPushButton {background-color: white}");
             //ui->leNumber->setText("");
@@ -1211,7 +1278,11 @@ void DlgPhone::UpdateCallStatus()
             break;
         case RisipCall::Status::CallConfirmed:
             ui->pbHold->setDisabled(false);
+            emit onHoldBtn(1);
+
             ui->pbHangup->setDisabled(false);
+            emit onHangupBtn(1);
+
             ui->pbAnswer->setStyleSheet("QPushButton {background-color: white}");
             ui->pbHangup->setStyleSheet(QString("QPushButton {background-color: %1}").arg(COLOUR_RED));
             ui->pbMute->setDisabled(false);
@@ -1221,8 +1292,12 @@ void DlgPhone::UpdateCallStatus()
             break;
         case RisipCall::Status::CallDisconnected:
             ui->pbHold->setDisabled(true);
+            emit onHoldBtn(0);
             ui->pbHangup->setDisabled(true);
+            emit onHangupBtn(0);
             ui->pbAnswer->setDisabled(true);
+            emit onAnswerBtn(0);
+
             ui->pbAnswer->setStyleSheet("QPushButton {background-color: white}");
             ui->pbHangup->setStyleSheet("QPushButton {background-color: white}");
             ui->pbMute->setDisabled(true);
@@ -1242,7 +1317,10 @@ void DlgPhone::UpdateCallStatus()
             break;
         case RisipCall::Status::ConnectingToCall:
             ui->pbHangup->setDisabled(false);
+            emit onHangupBtn(1);
             ui->pbAnswer->setDisabled(false);
+            emit onAnswerBtn(1);
+
             ui->pbMute->setDisabled(false);
 
             //change the colour of answer button
@@ -1251,13 +1329,17 @@ logConsole("Ans:Setting Yellow");
             break;
         case RisipCall::Status::IncomingCallStarted:
             ui->pbHangup->setDisabled(false);
+            emit onHangupBtn(1);
+
 //            ui->pbHangup->setStyleSheet("QPushButton {background-color: white}");
 
             //DND handled
             break;
         case RisipCall::Status::OutgoingCallStarted:
             ui->pbHangup->setDisabled(false);
+            emit onHangupBtn(1);
             ui->pbAnswer->setDisabled(true);
+            emit onAnswerBtn(0);
             ui->pbMute->setDisabled(false);
 
             ui->pbAnswer->setStyleSheet("QPushButton {background-color: white}");
@@ -1618,8 +1700,8 @@ void DlgPhone::autoDial(QString phoneNum)
       //          dlgIntercom->setContext(0);
                 break;
             case CONTEXT_BARGEIN:
-                dialSpecial(CODE_BERGEIN,DialedNumber, "Call in Barge-in mode.");
-                prefixedNumber = CODE_BERGEIN + DialedNumber;
+                dialSpecial(CODE_BARGEIN,DialedNumber, "Call in Barge-in mode.");
+                prefixedNumber = CODE_BARGEIN + DialedNumber;
 
                 break;
 
@@ -1650,6 +1732,7 @@ void DlgPhone::autoDial(QString phoneNum)
             activeCall->call();
 
             ui->pbHangup->setDisabled(false);
+            emit onHangupBtn(1);
             bDialRequest = true;
 
         }

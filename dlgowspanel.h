@@ -123,6 +123,16 @@ private slots:
 
     void on_pb_transfer_clicked();
 
+    void on_pbAnswer_clicked();
+
+    void on_pbHangup_clicked();
+
+    void on_pbHold_clicked();
+
+    void onAnswerBtnChange(int iFlag);
+    void onHangupBtnChange(int iFlag);
+    void onHoldBtnChange(int iFlag);
+
 private:
     Ui::DlgOWSPanel *ui;
     int iMaxDevice = MAX_OWS + MAX_RADIO + MAX_GSM + MAX_SATCOM + MAX_CBAND + MAX_CSM;

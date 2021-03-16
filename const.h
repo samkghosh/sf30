@@ -3,8 +3,8 @@
 
 //Define the code for Barge-in and whishper
 //#define CODE_SPY        "*22"
-//#define CODE_BERGEIN    "*24"
-#define CODE_BERGEIN    "*22"
+//#define CODE_BARGEIN    "*24"
+#define CODE_BARGEIN    "*22"
 #define CODE_WISHPER    "*23"
 #define CODE_TXFR       "#"
 #define CODE_CONF       "*34"

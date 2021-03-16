@@ -141,6 +141,9 @@ DlgOWSPanel::DlgOWSPanel(QWidget *parent) :
     connect(dlgPhone, SIGNAL(onDispCallStatus(QString)), this, SLOT(onDisplayCallStatus(QString)));
     connect(dlgPhone, SIGNAL(onDispPhoneStatus(QString)), this, SLOT(onDisplayPhoneStatus(QString)));
     connect(dlgPhone, SIGNAL(onDispMsg(QString)), this, SLOT(onDisplayMsg(QString)));
+    connect(dlgPhone, SIGNAL(onHangupBtn(int)), this, SLOT(onHangupBtnChange(int)));
+    connect(dlgPhone, SIGNAL(onAnswerBtn(int)), this, SLOT(onAnswerBtnChange(int)));
+    connect(dlgPhone, SIGNAL(onHoldBtn(int)), this, SLOT(onHoldBtnChange(int)));
 
 
     displayMMI(dlgPhone->getMyOWSNum());
@@ -586,15 +589,80 @@ void DlgOWSPanel::onDisplayMsg(QString msg)
 
 void DlgOWSPanel::on_pb_bergein_clicked()
 {
-
+    dlgPhone->processBargeIn(0);
 }
 
 void DlgOWSPanel::on_pb_wishper_clicked()
 {
-
+    dlgPhone->processWhisper(0);
 }
 
 void DlgOWSPanel::on_pb_transfer_clicked()
 {
+    dlgPhone->processTransfer(0);
+}
+
+void DlgOWSPanel::on_pbAnswer_clicked()
+{
+    dlgPhone->processAnswer();
+}
+
+void DlgOWSPanel::on_pbHangup_clicked()
+{
+    dlgPhone->processHangup();
+}
+
+void DlgOWSPanel::on_pbHold_clicked()
+{
+    dlgPhone->processHold();
+
+}
+
+
+void DlgOWSPanel::onAnswerBtnChange(int iFlag)
+{
+    if (iFlag == 0)
+    {
+        ui->pbAnswer->setDisabled(true);
+        ui->pbAnswer->setStyleSheet(QString("QPushButton {background-color: white}"));
+
+    }
+    else
+    {
+        ui->pbAnswer->setDisabled(false);
+        ui->pbAnswer->setStyleSheet(QString("QPushButton {background-color: %1}").arg(COLOUR_YELLOW));
+
+    }
+}
+
+void DlgOWSPanel::onHangupBtnChange(int iFlag)
+{
+    if (iFlag == 0)
+    {
+        ui->pbHangup->setDisabled(true);
+        ui->pbHangup->setStyleSheet(QString("QPushButton {background-color: white}"));
+
+    }
+    else
+    {
+        ui->pbHangup->setDisabled(false);
+        ui->pbHangup->setStyleSheet(QString("QPushButton {background-color: %1}").arg(COLOUR_YELLOW));
+
+    }
+
+}
+
+void DlgOWSPanel::onHoldBtnChange(int iFlag)
+{
+    if (iFlag == 0)
+    {
+        ui->pbHold->setDisabled(true);
+
+    }
+    else
+    {
+        ui->pbHold->setDisabled(false);
+
+    }
 
 }
